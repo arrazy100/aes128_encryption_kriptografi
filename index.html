@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES-128 Encryption/ Decryption</title>
+</head>
+<body>
+    <div class="form-input" style="margin-bottom: 10px;">
+        <label for="a">Plaintext</label>
+        <input type="text" name="plaintext" id="plaintext" maxlength="16">
+    </div>
+    <div class="form-input" style="margin-bottom: 10px;">
+        <label for="b">Key</label>
+        <input type="text" name="key" id="key" maxlength="16">
+    </div>
+    <div class="form-input" style="margin-bottom: 10px;">
+        <input type="button" value="AES Encryption" onclick="AESEncryption('plaintext', 'key');">
+    </div>
+
+    <div id="aes_encryption">AES: </div>
+
+    <div class="form-input" style="margin-bottom: 10px; margin-top: 10px;">
+        <label for="a">Encrypted</label>
+        <input type="text" name="encrypted" id="encrypted">
+    </div>
+    <div class="form-input" style="margin-bottom: 10px;">
+        <input type="button" value="AES Decryption" onclick="AESDecryption('encrypted', 'key');">
+    </div>
+
+    <div id="aes_decryption">Plain: </div>
+    
+    <script src="aes.js"></script>
+</body>
+</html>
