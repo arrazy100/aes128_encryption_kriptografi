@@ -253,3 +253,10 @@ function removeAllStep() {
         all_step[0].parentNode.removeChild(all_step[0]);
     }
 }
+
+function drawImage(parent, img_file) {
+    let el = document.createElement("img");
+    el.src = img_file;
+    el.style.width = "100%";
+    document.getElementById("" + parent).appendChild(el);
+}
