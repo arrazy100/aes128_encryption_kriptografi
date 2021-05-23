@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -42,7 +46,7 @@
 }
 
 .form-page {
-    padding: 8vw;
+    padding: 12vw;
 }
 
 .form-title {
@@ -173,5 +177,13 @@ input[type=button]:hover {
 }
 
 .step-col {
+    text-align: center;
+}
+
+.skip-btn {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    color: white;
     text-align: center;
 }

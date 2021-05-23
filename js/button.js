@@ -11,6 +11,9 @@ encryption_page_btn.addEventListener("click", function() {
 
     encryption_page.style.display = "block";
     decryption_page.style.display = "none";
+
+    document.getElementById("footer_btn").style.display = "none";
+    removeAllStep();
 });
 
 decryption_page_btn.addEventListener("click", function() {
@@ -18,6 +21,9 @@ decryption_page_btn.addEventListener("click", function() {
 
     encryption_page.style.display = "none";
     decryption_page.style.display = "block";
+
+    document.getElementById("footer_btn").style.display = "none";
+    removeAllStep();
 });
 
 function copyText(id) {
@@ -28,3 +34,12 @@ function copyText(id) {
 
     window.getSelection().removeAllRanges();
 }
+
+document.getElementById("skip_btn").addEventListener("click", function() {
+    delay_time = 0;
+    loop_delay = 0;
+});
+
+document.getElementById("top_btn").addEventListener("click", function() {
+    document.getElementById("top").scrollIntoView();
+});

@@ -346,7 +346,6 @@ async function KeyScheduleToElement(parent, key_hex) {
         rkey_sbox.scrollIntoView();
 
         let rkey_sbox_result = drawCenterText(parent, "");
-        rkey_sbox_result.scrollIntoView();
         
         let s_bytes = "";
         for (let i = 0; i < last_col.length; i += 2) {
@@ -376,7 +375,6 @@ async function KeyScheduleToElement(parent, key_hex) {
         );
 
         let xor_rkey = drawCenterText(parent, "XOR hasil Sub Bytes dengan kolom pertama dan matriks rcon");
-        xor_rkey.scrollIntoView();
 
         await timer(delay_time);
 
@@ -388,7 +386,6 @@ async function KeyScheduleToElement(parent, key_hex) {
         xor_matrix.scrollIntoView();
 
         let xor_matrix_result = drawCenterText(parent, "");
-        xor_matrix_result.scrollIntoView();
 
         let first_col_newround = "";
         for (let i = 0; i < 8; i += 2) {
@@ -409,7 +406,6 @@ async function KeyScheduleToElement(parent, key_hex) {
         }
 
         let xor_three_result = drawCenterText(parent, "Hasil XOR digunakan sebagai kolom pertama Key Schedule baru");
-        xor_three_result.scrollIntoView();
 
         await timer(delay_time);
 
@@ -488,7 +484,6 @@ async function SubBytesWithContext(parent, arr) {
     sbox.scrollIntoView();
 
     let sbox_result = drawCenterText(parent, "");
-    sbox_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
         let col_matrix = sbox.rows[i].cells;
@@ -519,7 +514,6 @@ async function InvSubBytesWithContext(parent, arr) {
     sbox.scrollIntoView();
 
     let sbox_result = drawCenterText(parent, "");
-    sbox_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
         let col_matrix = sbox.rows[i].cells;
@@ -579,7 +573,6 @@ async function MixColumnWithContext(parent, arr) {
     let d1_result = drawCenterText(parent, "");
     let d2_result = drawCenterText(parent, "");
     let d3_result = drawCenterText(parent, "");
-    d3_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
         mc[0][i] = multiply_2[arr[0][i]] ^ multiply_3[arr[1][i]] ^ arr[2][i] ^ arr[3][i]; // 2 3 1 1
@@ -648,7 +641,6 @@ async function InvMixColumnWithContext(parent, arr) {
     let d1_result = drawCenterText(parent, "");
     let d2_result = drawCenterText(parent, "");
     let d3_result = drawCenterText(parent, "");
-    d3_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
         mc[0][i] = multiply_14[arr[0][i]] ^ multiply_11[arr[1][i]] ^ multiply_13[arr[2][i]] ^ multiply_9[arr[3][i]]; // 14 11 13 9
@@ -766,6 +758,11 @@ async function AESEncryption(plaintext_id, key_id) {
 
     allTables();
 
+    delay_time = 2000;
+    loop_delay = 1000;
+
+    document.getElementById("footer_btn").style.display = "block";
+
     let plaintext = document.getElementById("" + plaintext_id).value;
     let key = document.getElementById("" + key_id).value;
 
@@ -810,7 +807,6 @@ async function AESEncryption(plaintext_id, key_id) {
     rc_result.scrollIntoView();
 
     let rc_context = drawCenterText("Round0", "");
-    rc_context.scrollIntoView();
 
     let rc = await AddRoundKeyWithContext(rc_result, rc_context, plaintext_array, key_array);
     
@@ -863,7 +859,6 @@ async function AESEncryption(plaintext_id, key_id) {
         let rc_result = drawcenterArray("Round" + i.toString(), generateNullMatrix(), "Hasil Operasi AddRoundKey");
         rc_result.scrollIntoView();
         let rc_context = drawCenterText("Round" + i.toString(), "");
-        rc_context.scrollIntoView();
         rc = await AddRoundKeyWithContext(rc_result, rc_context, mix_column, rkey[i]);
     }
 
@@ -898,7 +893,6 @@ async function AESEncryption(plaintext_id, key_id) {
     rc_result = drawcenterArray("Round10", generateNullMatrix(), "Hasil Operasi AddRoundKey");
     rc_result.scrollIntoView();
     rc_context = drawCenterText("Round10", "");
-    rc_context.scrollIntoView();
     rc = await AddRoundKeyWithContext(rc_result, rc_context, shift_rows, rkey[10]);
 
     let output = "";
@@ -915,6 +909,11 @@ async function AESDecryption(encrypted_id, key_id) {
     removeAllStep();
 
     allTables();
+
+    delay_time = 2000;
+    loop_delay = 1000;
+
+    document.getElementById("footer_btn").style.display = "block";
 
     let plaintext = document.getElementById("" + encrypted_id).value;
     let key = document.getElementById("" + key_id).value;
@@ -956,7 +955,6 @@ async function AESDecryption(encrypted_id, key_id) {
     let rc_result = drawcenterArray("Round10", generateNullMatrix(), "Hasil Operasi AddRoundKey");
     rc_result.scrollIntoView();
     let rc_context = drawCenterText("Round10", "");
-    rc_context.scrollIntoView();
     let rc = await AddRoundKeyWithContext(rc_result, rc_context, plaintext_array, rkey[10]);
 
     let shift_rows_text = drawListText("Round10", "Operasi Inverse Shift Rows, Geser baris pertama matriks sebanyak 4 kali, " +
@@ -988,7 +986,6 @@ async function AESDecryption(encrypted_id, key_id) {
         let rc_result = drawcenterArray("Round" + i.toString(), generateNullMatrix(), "Hasil Operasi AddRoundKey");
         rc_result.scrollIntoView();
         let rc_context = drawCenterText("Round" + i.toString(), "");
-        rc_context.scrollIntoView();
         let rc = await AddRoundKeyWithContext(rc_result, rc_context, sbytes, rkey[i]);
 
         await timer(delay_time);
@@ -1044,7 +1041,6 @@ async function AESDecryption(encrypted_id, key_id) {
     rc_result.scrollIntoView();
 
     rc_context = drawCenterText("Round0", "");
-    rc_context.scrollIntoView();
 
     rc = await AddRoundKeyWithContext(rc_result, rc_context, sbytes, key_array);
 
