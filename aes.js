@@ -258,7 +258,18 @@ function KeySchedule(key_hex) {
         let rkey_before = rkey[round - 1];
 
         let first_col = rkey_before.substring(0, 8);
+
         let last_col = rkey_before.substring(26, 32) + rkey_before.substring(24, 26);
+
+        if (round === 1) {
+            // drawText("Before:");
+            // let a = createMatrixFromHex(rkey_before.substring(24, 32));
+            // drawMatrix(a);
+            // drawText("After:");
+            // let b = createMatrixFromHex(last_col);
+            // drawMatrix(b);
+        }
+
         let current_rcon = rcon[round - 1];
         
         let s_bytes = "";
@@ -420,18 +431,52 @@ function AddRoundKey(plaintext_array, key_array) {
     return rc;
 }
 
-function AESEncryption(plaintext_id, key_id) {
+async function AESEncryption(plaintext_id, key_id) {
+    removeAllStep();
+
     let plaintext = document.getElementById("" + plaintext_id).value;
     let key = document.getElementById("" + key_id).value;
 
+    let round_0 = newStep("Round 0");
+    
+    round_0.scrollIntoView();
+
+    textWithTwoColumns("Round0", "Plain Text", plaintext);
+    textWithTwoColumns("Round0", "Key", key);
+
+    await timer(2000);
+
+    let konversihex_text = drawListText("Round0", "Lakukan konversi plain text dan key menjadi hexadecimal");
+    konversihex_text.scrollIntoView();
+
     let plaintext_hex = string_to_hex(plaintext);
     let key_hex = string_to_hex(key);
+
+    textWithTwoColumns("Round0", "Plain Text Hex", plaintext_hex);
+    textWithTwoColumns("Round0", "Key Hex", key_hex);
+
+    await timer(2000);
 
     let plaintext_array = hex_to_array(plaintext_hex);
     let key_array = hex_to_array(key_hex);
 
     // Round 0
+    let round0_addroundkey_text = drawListText("Round0", "Operasi AddRoundKey, lakukan XOR terhadap setiap blok matriks plain text dengan key");
+    round0_addroundkey_text.scrollIntoView();
+    
+    arrayWithThreeColumns("Round0", "Plain Text Matrix", "Key Matrix", plaintext_array, key_array);
+
+    await timer(2000);
+
+    // Add Round Key
     let rc = AddRoundKey(plaintext_array, key_array);
+
+    // let table_rc = addTable("Round0");
+    // addRowWithTimer(table_rc, rc, 1000);
+    let rc_result = drawcenterArray("Round0", rc, "Hasil Operasi AddRoundKey");
+    rc_result.scrollIntoView();
+
+    console.log(rc);
 
     // Key Scheduling
     let rkey = KeySchedule(key_hex);
@@ -456,7 +501,7 @@ function AESEncryption(plaintext_id, key_id) {
         }
     }
 
-    document.getElementById("aes_encryption").innerHTML = "AES: " + encode_hex(output);
+    document.getElementById("aes_encryption").value = encode_hex(output);
 }
 
 function AESDecryption(encrypted_id, key_id) {
@@ -495,5 +540,5 @@ function AESDecryption(encrypted_id, key_id) {
         }
     }
 
-    document.getElementById("aes_decryption").innerHTML = "Plain: " + hex_to_string(output);
+    document.getElementById("aes_decryption").value = hex_to_string(output);
 }

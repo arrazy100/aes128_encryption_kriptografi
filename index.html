@@ -5,32 +5,65 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AES-128 Encryption/ Decryption</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="form-input" style="margin-bottom: 10px;">
-        <label for="a">Plaintext</label>
-        <input type="text" name="plaintext" id="plaintext" maxlength="16">
-    </div>
-    <div class="form-input" style="margin-bottom: 10px;">
-        <label for="b">Key</label>
-        <input type="text" name="key" id="key" maxlength="16">
-    </div>
-    <div class="form-input" style="margin-bottom: 10px;">
-        <input type="button" value="AES Encryption" onclick="AESEncryption('plaintext', 'key');">
+    <div class="container">
+        <div class="form-card">
+            <div class="tab-menu">
+                <div class="tab-item" id="encryption_page_btn">
+                    Encryption
+                </div>
+                <div class="tab-item" id="decryption_page_btn">
+                    Decryption
+                </div>
+            </div>
+
+            <div class="form-page" id="encryption_page">
+                <div class="form-title">
+                    AES Encryption
+                </div>
+                <div class="form-input">
+                    <input type="text" name="plaintext" id="plaintext" maxlength="16" placeholder="Plain text">
+                </div>
+                <div class="form-input">
+                    <input type="text" name="key" id="key" maxlength="16" placeholder="Key">
+                </div>
+                
+                <input type="button" class="form-button" value="AES Encryption" onclick="AESEncryption('plaintext', 'key');">
+
+                <div class="result-text">
+                    <input type="text" id="aes_encryption" placeholder="Encrypted Text">
+                    <input style="margin-top: 10px;" type="button" class="form-button" value="Copy Text" onclick="copyText('aes_encryption');">
+                </div>
+            </div>
+
+            <div class="form-page" id="decryption_page">
+                <div class="form-title">
+                    AES Decryption
+                </div>
+                <div class="form-input">
+                    <input type="text" name="encrypted_text" id="encrypted_text" placeholder="Encrypted Text">
+                </div>
+                <div class="form-input">
+                    <input type="text" name="decryption_key" id="decryption_key" maxlength="16" placeholder="Decryption Key">
+                </div>
+                
+                <input type="button" class="form-button" value="AES Decryption" onclick="AESDecryption('encrypted_text', 'decryption_key');">
+
+                <div class="result-text">
+                    <input type="text" id="aes_decryption" placeholder="Decrypted Text">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="aes_encryption">AES: </div>
-
-    <div class="form-input" style="margin-bottom: 10px; margin-top: 10px;">
-        <label for="a">Encrypted</label>
-        <input type="text" name="encrypted" id="encrypted">
+    <div class="step-container" id="drawable">
     </div>
-    <div class="form-input" style="margin-bottom: 10px;">
-        <input type="button" value="AES Decryption" onclick="AESDecryption('encrypted', 'key');">
-    </div>
-
-    <div id="aes_decryption">Plain: </div>
     
+    <script src="draw.js"></script>
     <script src="aes.js"></script>
+    <script src="button.js"></script>
 </body>
 </html>
