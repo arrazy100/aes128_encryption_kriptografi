@@ -766,8 +766,6 @@ async function AESEncryption(plaintext_id, key_id) {
 
     allTables();
 
-    return;
-
     let plaintext = document.getElementById("" + plaintext_id).value;
     let key = document.getElementById("" + key_id).value;
 
@@ -915,6 +913,8 @@ async function AESEncryption(plaintext_id, key_id) {
 
 async function AESDecryption(encrypted_id, key_id) {
     removeAllStep();
+
+    allTables();
 
     let plaintext = document.getElementById("" + encrypted_id).value;
     let key = document.getElementById("" + key_id).value;
