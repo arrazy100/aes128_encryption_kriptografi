@@ -159,6 +159,19 @@ input[type=button]:hover {
     margin: 10px 0;
 }
 
+@media(min-width: 767px) {
+    .step-threecol-container > *:nth-child(1) {
+        flex: 1 1 33%;
+    }
+    .step-threecol-container > *:nth-child(2) {
+        flex: 1 1 33%;
+        align-self: center;
+    }
+    .step-threecol-container > *:nth-child(3) {
+        flex: 1 1 33%;
+    }
+}
+
 .step-col {
     text-align: center;
 }

@@ -22,11 +22,25 @@ function createMatrixFromHex(arr, is_center) {
 
     if (arr.length === 8) {
         for (let i = 0; i < 8; i+= 2) {
-            console.log( i / 2);
             let row = matrix.insertRow(i / 2);
             let col = row.insertCell(0);
             col.innerHTML = arr[i] + arr[i + 1];
-            col.style.border = "1px solid black";
+            col.classList.add("matrix");
+        }
+    }
+
+    return matrix;
+}
+
+function generateNullMatrix() {
+    let matrix = new Array(4);
+    for (let i = 0; i < 4; i++) {
+        matrix[i] = new Array(4);
+    }
+
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[0].length; j++) {
+            matrix[i][j] = 0;
         }
     }
 
@@ -73,6 +87,13 @@ function drawText(parent, text) {
     return el;
 }
 
+function drawCenterText(parent, text) {
+    let t = drawText(parent, text);
+    t.style.textAlign = "center";
+
+    return t;
+}
+
 function drawListText(parent, text) {
     let ul = document.createElement("ul");
     ul.style.marginTop = "30px";
@@ -102,7 +123,23 @@ function drawcenterArray(parent, arr, arr_title) {
 
     document.getElementById("" + parent).appendChild(container);
 
-    return container;
+    return matrix;
+}
+
+function drawcenterHex(parent, hex, hex_title) {
+    let container = document.createElement("div");
+    container.classList.add("step-center-container");
+
+    let col = document.createElement("div");
+    col.innerHTML = hex_title;
+    col.classList.add("step-col");
+    let matrix = createMatrixFromHex(hex, true);
+    drawMatrixToElement(col, matrix);
+    container.appendChild(col);
+
+    document.getElementById("" + parent).appendChild(container);
+
+    return matrix;
 }
 
 function textWithTwoColumns(parent, text_1, text_2) {
@@ -120,7 +157,28 @@ function textWithTwoColumns(parent, text_1, text_2) {
     document.getElementById("" + parent).appendChild(container);
 }
 
-function arrayWithThreeColumns(parent, arr1_title, arr2_title, arr1, arr2) {
+function arrayWithTwoColumns(parent, arr1_title, arr2_title, arr1, arr2) {
+    let container = document.createElement("div");
+    container.classList.add("step-twocol-container");
+
+    let col = document.createElement("div");
+    col.innerHTML = arr1_title;
+    col.classList.add("step-col");
+    let matrix1 = createMatrixFromArray(arr1, true);
+    drawMatrixToElement(col, matrix1);
+    container.appendChild(col);
+
+    let col2 = document.createElement("div");
+    col2.innerHTML = arr2_title;
+    col2.classList.add("step-col");
+    let matrix2 = createMatrixFromArray(arr2, true);
+    drawMatrixToElement(col2, matrix2);
+    container.appendChild(col2);
+
+    document.getElementById("" + parent).appendChild(container);
+}
+
+function arrayWithTwoColumnsXOR(parent, arr1_title, arr2_title, arr1, arr2) {
     let container = document.createElement("div");
     container.classList.add("step-threecol-container");
 
@@ -141,6 +199,34 @@ function arrayWithThreeColumns(parent, arr1_title, arr2_title, arr1, arr2) {
     col3.classList.add("step-col");
     let matrix2 = createMatrixFromArray(arr2, true);
     drawMatrixToElement(col3, matrix2);
+    container.appendChild(col3);
+
+    document.getElementById("" + parent).appendChild(container);
+}
+
+function arrayWithThreeColumns(parent, arr1_title, arr2_title, arr3_title, arr1, arr2, arr3) {
+    let container = document.createElement("div");
+    container.classList.add("step-threecol-container");
+
+    let col = document.createElement("div");
+    col.innerHTML = arr1_title;
+    col.classList.add("step-col");
+    let matrix1 = createMatrixFromArray(arr1, true);
+    drawMatrixToElement(col, matrix1);
+    container.appendChild(col);
+
+    let col2 = document.createElement("div");
+    col2.innerHTML = arr2_title;
+    col2.classList.add("step-col");
+    let matrix2 = createMatrixFromArray(arr2, true);
+    drawMatrixToElement(col2, matrix2);
+    container.appendChild(col2);
+
+    let col3 = document.createElement("div");
+    col3.innerHTML = arr3_title;
+    col3.classList.add("step-col");
+    let matrix3 = createMatrixFromArray(arr3, true);
+    drawMatrixToElement(col3, matrix3);
     container.appendChild(col3);
 
     document.getElementById("" + parent).appendChild(container);

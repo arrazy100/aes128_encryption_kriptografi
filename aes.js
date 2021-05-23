@@ -1,3 +1,6 @@
+var delay_time = 2000;
+var loop_delay = 1000;
+
 function hex_to_decimal(hex_string) {
     let dec = parseInt(hex_string, 16);
 
@@ -261,15 +264,6 @@ function KeySchedule(key_hex) {
 
         let last_col = rkey_before.substring(26, 32) + rkey_before.substring(24, 26);
 
-        if (round === 1) {
-            // drawText("Before:");
-            // let a = createMatrixFromHex(rkey_before.substring(24, 32));
-            // drawMatrix(a);
-            // drawText("After:");
-            // let b = createMatrixFromHex(last_col);
-            // drawMatrix(b);
-        }
-
         let current_rcon = rcon[round - 1];
         
         let s_bytes = "";
@@ -310,31 +304,236 @@ function KeySchedule(key_hex) {
     return rkey;
 }
 
-function SubBytes(arr) {
-    let s_bytes = arr;
+async function KeyScheduleToElement(parent, key_hex) {
+    let rkey = new Array(11);
+    rkey[0] = key_hex;
+
+    let round_0 = drawListText(parent, "Round 0");
+    round_0.scrollIntoView();
+
+    await timer(delay_time);
+
+    let rkey_round0 = drawcenterArray(parent, hex_to_array(rkey[0]), "Key Schedule Round 0");
+    rkey_round0.scrollIntoView();
+
+    await timer(delay_time);
+
+    for (let round = 1; round <= 10; round++) {
+        let rkey_before = rkey[round - 1];
+
+        let round_i = drawListText(parent, "Round " + round);
+        round_i.scrollIntoView();
+
+        let last_col = rkey_before.substring(26, 32) + rkey_before.substring(24, 26);
+
+        arrayWithTwoColumns(
+            parent,
+            "Ambil kolom terakhir Round " + (round - 1).toString(),
+            "Pindahkan blok paling atas ke bawah",
+            hex_to_array(rkey_before.substring(24, 32)),
+            hex_to_array(last_col)
+        );
+
+        await timer(delay_time);
+
+        let null_matrix = new Array(4);
+        for (let i = 0; i < 4; i++) {
+            null_matrix[i] = new Array(1);
+            null_matrix[i][0] = 0;
+        }
+
+        let rkey_sbox = drawcenterArray(parent, null_matrix, "Substitusi S-Box");
+        rkey_sbox.scrollIntoView();
+
+        let rkey_sbox_result = drawCenterText(parent, "");
+        rkey_sbox_result.scrollIntoView();
+        
+        let s_bytes = "";
+        for (let i = 0; i < last_col.length; i += 2) {
+            let row = hex_to_decimal(last_col[i]);
+            let col = hex_to_decimal(last_col[i + 1]);
+
+            let col_matrix = rkey_sbox.rows[Math.floor((i + 1 )/ 2)].cells;
+            col_matrix[0].innerHTML = s_box[row][col];
+            rkey_sbox_result.innerHTML = "Baris ke-" + row + " dan " + "Kolom ke-" + col + " = " + s_box[row][col];
+
+            s_bytes += s_box[row][col];
+
+            await timer(loop_delay);
+        }
+
+        let first_col = rkey_before.substring(0, 8);
+        let current_rcon = rcon[round - 1];
+
+        arrayWithThreeColumns(
+            parent,
+            "Sub Bytes",
+            "Kolom Pertama Round " + (round - 1).toString(),
+            "Rcon",
+            hex_to_array(s_bytes),
+            hex_to_array(first_col),
+            hex_to_array(current_rcon)
+        );
+
+        let xor_rkey = drawCenterText(parent, "XOR hasil Sub Bytes dengan kolom pertama dan matriks rcon");
+        xor_rkey.scrollIntoView();
+
+        await timer(delay_time);
+
+        for (let i = 0; i < 4; i++) {
+            null_matrix[i][0] = 0;
+        }
+
+        let xor_matrix = drawcenterArray(parent, null_matrix, "Hasil XOR");
+        xor_matrix.scrollIntoView();
+
+        let xor_matrix_result = drawCenterText(parent, "");
+        xor_matrix_result.scrollIntoView();
+
+        let first_col_newround = "";
+        for (let i = 0; i < 8; i += 2) {
+            let xor_result = XOR(first_col[i] + first_col[i + 1], s_bytes[i] + s_bytes[i + 1]);
+            xor_result = XOR(xor_result, current_rcon[i] + current_rcon[i + 1]);
+
+            first_col_newround += xor_result;
+
+            let col_matrix = xor_matrix.rows[Math.floor((i + 1 )/ 2)].cells;
+            col_matrix[0].innerHTML = xor_result;
+            xor_matrix_result.innerHTML = 
+                "XOR dari " + s_bytes[i] + s_bytes[i + 1] +
+                " dengan " + first_col[i] + first_col[i + 1] +
+                " dan " + current_rcon[i] + current_rcon[i + 1] +
+                " = " + xor_result;
+
+            await timer(loop_delay);
+        }
+
+        let xor_three_result = drawCenterText(parent, "Hasil XOR digunakan sebagai kolom pertama Key Schedule baru");
+        xor_three_result.scrollIntoView();
+
+        await timer(delay_time);
+
+        let new_keyschedule = drawcenterArray(parent, generateNullMatrix(), "Key Schedule Baru");
+        new_keyschedule.scrollIntoView();
+        let col1_keyschedule = hex_to_array(first_col_newround);
+        new_keyschedule.rows[0].cells[0].innerHTML = col1_keyschedule[0][0];
+        new_keyschedule.rows[1].cells[0].innerHTML = col1_keyschedule[1][0];
+        new_keyschedule.rows[2].cells[0].innerHTML = col1_keyschedule[2][0];
+        new_keyschedule.rows[3].cells[0].innerHTML = col1_keyschedule[3][0];
+
+        let second_col = rkey_before.substring(8, 16);
+        let third_col = rkey_before.substring(16, 24);
+        let fourth_col = rkey_before.substring(24, 32);
+        let second_col_newround = "";
+        let third_col_newround = "";
+        let fourth_col_newround = "";
+
+        let second_col_text = drawCenterText(parent, "");
+        second_col_text.innerHTML = "Kolom kedua Key Schedule baru = XOR kolom pertama Key Schedule baru dengan kolom kedua Round " + (round - 1).toString();
+        let second_col_result = drawCenterText(parent, "");
+
+        let third_col_text = drawCenterText(parent, "");
+        third_col_text.innerHTML = "Kolom ketiga Key Schedule baru = XOR kolom kedua Key Schedule baru dengan kolom ketiga Round " + (round - 1).toString();
+        let third_col_result = drawCenterText(parent, "");
+
+        let fourth_col_text = drawCenterText(parent, "");
+        fourth_col_text.innerHTML = "Kolom keempat Key Schedule baru = XOR kolom ketiga Key Schedule baru dengan kolom keempat Round " + (round - 1).toString();
+        let fourth_col_result = drawCenterText(parent, "");
+
+        for (let i = 0; i < 8; i += 2) {
+            second_col_newround += XOR(first_col_newround[i] + first_col_newround[i + 1], second_col[i] + second_col[i + 1]);
+
+            let col_matrix = new_keyschedule.rows[Math.floor((i + 1 )/ 2)].cells;
+            col_matrix[1].innerHTML = XOR(first_col_newround[i] + first_col_newround[i + 1], second_col[i] + second_col[i + 1]);
+            second_col_result.innerHTML = first_col_newround[i] + first_col_newround[i + 1] +
+                                            " XOR " + second_col[i] + second_col[i + 1] +
+                                            " = " + col_matrix[1].innerHTML;
+
+            third_col_newround += XOR(second_col_newround[i] + second_col_newround[i + 1], third_col[i] + third_col[i + 1]);
+
+            col_matrix = new_keyschedule.rows[Math.floor((i + 1 )/ 2)].cells;
+            col_matrix[2].innerHTML = XOR(second_col_newround[i] + second_col_newround[i + 1], third_col[i] + third_col[i + 1]);
+            third_col_result.innerHTML = second_col_newround[i] + second_col_newround[i + 1] +
+                                            " XOR " + third_col[i] + third_col[i + 1] +
+                                            " = " + col_matrix[2].innerHTML;
+
+            fourth_col_newround += XOR(third_col_newround[i] + third_col_newround[i + 1], fourth_col[i] + fourth_col[i + 1]);
+
+            col_matrix = new_keyschedule.rows[Math.floor((i + 1 )/ 2)].cells;
+            col_matrix[3].innerHTML = XOR(third_col_newround[i] + third_col_newround[i + 1], fourth_col[i] + fourth_col[i + 1]);
+            fourth_col_result.innerHTML = third_col_newround[i] + third_col_newround[i + 1] +
+                                            " XOR " + fourth_col[i] + fourth_col[i + 1] +
+                                            " = " + col_matrix[3].innerHTML;
+
+            await timer(loop_delay);
+        }
+
+        rkey[round] = first_col_newround + second_col_newround + third_col_newround + fourth_col_newround;
+    }
+
+    for (let i = 0; i <= 10; i++) {
+        rkey[i] = hex_to_array(rkey[i]);
+    }
+
+    return rkey;
+}
+
+async function SubBytesWithContext(parent, arr) {
+    let s_bytes = new Array(4);
+    for (let i = 0; i < 4; i++) {
+        s_bytes[i] = new Array(4);
+    }
+
+    let sbox = drawcenterArray(parent, generateNullMatrix(), "Substitusi S-Box");
+    sbox.scrollIntoView();
+
+    let sbox_result = drawCenterText(parent, "");
+    sbox_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
+        let col_matrix = sbox.rows[i].cells;
         for (let j = 0; j < 4; j++) {
             let curr = arr[i][j];
+            if (curr.length === 1) curr = "0" + curr;
             let row = hex_to_decimal(curr[0]);
             let col = hex_to_decimal(curr[1]);
             s_bytes[i][j] = s_box[row][col];
+
+            col_matrix[j].innerHTML = s_box[row][col];
+            sbox_result.innerHTML = "Baris ke-" + curr[0] + " dan " + "Kolom ke-" + curr[1] + " = " + s_box[row][col];
+
+            await timer(loop_delay);
         }
     }
 
     return s_bytes;
 }
 
-function InvSubBytes(arr) {
-    let s_bytes = arr;
+async function InvSubBytesWithContext(parent, arr) {
+    let s_bytes = new Array(4);
+    for (let i = 0; i < 4; i++) {
+        s_bytes[i] = new Array(4);
+    }
+
+    let sbox = drawcenterArray(parent, generateNullMatrix(), "Substitusi S-Box");
+    sbox.scrollIntoView();
+
+    let sbox_result = drawCenterText(parent, "");
+    sbox_result.scrollIntoView();
 
     for (let i = 0; i < 4; i++) {
+        let col_matrix = sbox.rows[i].cells;
         for (let j = 0; j < 4; j++) {
             let curr = arr[i][j];
             if (curr.length === 1) curr = "0" + curr;
             let row = hex_to_decimal(curr[0]);
             let col = hex_to_decimal(curr[1]);
             s_bytes[i][j] = inv_s_box[row][col];
+
+            col_matrix[j].innerHTML = inv_s_box[row][col];
+            sbox_result.innerHTML = "Baris ke-" + curr[0] + " dan " + "Kolom ke-" + curr[1] + " = " + inv_s_box[row][col];
+
+            await timer(loop_delay);
         }
     }
 
@@ -361,7 +560,7 @@ function InvShiftRows(arr) {
     return shifted;
 }
 
-function MixColumn(arr) {
+async function MixColumnWithContext(parent, arr) {
     let mc = new Array(4);
     for (let i = 0; i < mc.length; i++) {
         mc[i] = new Array(4);
@@ -373,11 +572,51 @@ function MixColumn(arr) {
         }
     }
 
+    let mix_column = drawcenterArray(parent, generateNullMatrix(), "Mix Column");
+    mix_column.scrollIntoView();
+
+    let d0_result = drawCenterText(parent, "");
+    let d1_result = drawCenterText(parent, "");
+    let d2_result = drawCenterText(parent, "");
+    let d3_result = drawCenterText(parent, "");
+    d3_result.scrollIntoView();
+
     for (let i = 0; i < 4; i++) {
         mc[0][i] = multiply_2[arr[0][i]] ^ multiply_3[arr[1][i]] ^ arr[2][i] ^ arr[3][i]; // 2 3 1 1
+
+        let col_matrix = mix_column.rows[0].cells;
+        col_matrix[i].innerHTML = decimal_to_hex(mc[0][i]);
+        d0_result.innerHTML = "2 * " + decimal_to_hex(arr[0][i]) + " + 3 * " + decimal_to_hex(arr[1][i]) +
+                                " + 1 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i]))  + " = " + col_matrix[i].innerHTML;
+        
+        await timer(loop_delay);
+
         mc[1][i] = arr[0][i] ^ multiply_2[arr[1][i]] ^ multiply_3[arr[2][i]] ^ arr[3][i]; // 1 2 3 1
+
+        col_matrix = mix_column.rows[1].cells;
+        col_matrix[i].innerHTML = decimal_to_hex(mc[1][i]);
+        d1_result.innerHTML = "1 * " + decimal_to_hex(arr[0][i]) + " + 2 * " + decimal_to_hex(arr[1][i]) +
+                                " + 3 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i]))  + " = " + col_matrix[i].innerHTML;
+
+        await timer(loop_delay);
+
         mc[2][i] = arr[0][i] ^ arr[1][i] ^ multiply_2[arr[2][i]] ^ multiply_3[arr[3][i]]; // 1 1 2 3
+
+        col_matrix = mix_column.rows[2].cells;
+        col_matrix[i].innerHTML = decimal_to_hex(mc[2][i]);
+        d2_result.innerHTML = "1 * " + decimal_to_hex(arr[0][i]) + " + 2 * " + decimal_to_hex(arr[1][i]) +
+                                " + 3 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i])) + " = " + col_matrix[i].innerHTML;
+
+        await timer(loop_delay);
+
         mc[3][i] = multiply_3[arr[0][i]] ^ arr[1][i] ^ arr[2][i] ^ multiply_2[arr[3][i]]; // 3 1 1 2
+
+        col_matrix = mix_column.rows[3].cells;
+        col_matrix[i].innerHTML = decimal_to_hex(mc[3][i]);
+        d3_result.innerHTML = "3 * " + decimal_to_hex(arr[0][i]) + " + 1 * " + decimal_to_hex(arr[1][i]) +
+                                " + 1 * " + decimal_to_hex(arr[2][i] + " + 2 * " + decimal_to_hex(arr[3][i])) + " = " + col_matrix[i].innerHTML;
+
+        await timer(loop_delay);
     }
 
     for (let i = 0; i < 4; i++) {
@@ -431,68 +670,160 @@ function AddRoundKey(plaintext_array, key_array) {
     return rc;
 }
 
+async function AddRoundKeyWithContext(table, context, plaintext_array, key_array) {
+    let rc = new Array(4);
+    for (let i = 0; i < rc.length; i++) {
+        rc[i] = new Array(4);
+    }
+
+    for (let i = 0; i < 4; i++) {
+        let col = table.rows[i].cells;
+        for (let j = 0; j < 4; j++) {
+            rc[i][j] = XOR(plaintext_array[i][j], key_array[i][j]);
+
+            col[j].innerHTML = rc[i][j];
+            context.innerHTML = plaintext_array[i][j] + " XOR " + key_array[i][j] + " = " + rc[i][j];
+
+            await timer(loop_delay);
+        }
+    }
+
+    return rc;
+}
+
 async function AESEncryption(plaintext_id, key_id) {
     removeAllStep();
 
     let plaintext = document.getElementById("" + plaintext_id).value;
     let key = document.getElementById("" + key_id).value;
 
+    let plaintext_hex = string_to_hex(plaintext);
+    let key_hex = string_to_hex(key);
+
+    let plaintext_array = hex_to_array(plaintext_hex);
+    let key_array = hex_to_array(key_hex);
+
+    // Key Scheduling
+    let rkey_step = newStep("Key Scheduling");
+    rkey_step.scrollIntoView();
+
+    let rkey = await KeyScheduleToElement("KeyScheduling", key_hex);
+
+    // Round 0
     let round_0 = newStep("Round 0");
-    
     round_0.scrollIntoView();
 
     textWithTwoColumns("Round0", "Plain Text", plaintext);
     textWithTwoColumns("Round0", "Key", key);
 
-    await timer(2000);
+    await timer(delay_time);
 
     let konversihex_text = drawListText("Round0", "Lakukan konversi plain text dan key menjadi hexadecimal");
     konversihex_text.scrollIntoView();
 
-    let plaintext_hex = string_to_hex(plaintext);
-    let key_hex = string_to_hex(key);
-
     textWithTwoColumns("Round0", "Plain Text Hex", plaintext_hex);
     textWithTwoColumns("Round0", "Key Hex", key_hex);
 
-    await timer(2000);
+    await timer(delay_time);
 
-    let plaintext_array = hex_to_array(plaintext_hex);
-    let key_array = hex_to_array(key_hex);
-
-    // Round 0
     let round0_addroundkey_text = drawListText("Round0", "Operasi AddRoundKey, lakukan XOR terhadap setiap blok matriks plain text dengan key");
     round0_addroundkey_text.scrollIntoView();
     
-    arrayWithThreeColumns("Round0", "Plain Text Matrix", "Key Matrix", plaintext_array, key_array);
+    arrayWithTwoColumnsXOR("Round0", "Plain Text Matrix", "Key Matrix", plaintext_array, key_array);
 
-    await timer(2000);
+    await timer(delay_time);
 
     // Add Round Key
-    let rc = AddRoundKey(plaintext_array, key_array);
-
-    // let table_rc = addTable("Round0");
-    // addRowWithTimer(table_rc, rc, 1000);
-    let rc_result = drawcenterArray("Round0", rc, "Hasil Operasi AddRoundKey");
+    let rc_result = drawcenterArray("Round0", generateNullMatrix(), "Hasil Operasi AddRoundKey");
     rc_result.scrollIntoView();
 
-    console.log(rc);
+    let rc_context = drawCenterText("Round0", "");
+    rc_context.scrollIntoView();
 
-    // Key Scheduling
-    let rkey = KeySchedule(key_hex);
+    let rc = await AddRoundKeyWithContext(rc_result, rc_context, plaintext_array, key_array);
     
     // Round 1 - 9
     for (let i = 1; i < 10; i++) {
-        let sbytes = SubBytes(rc);
+        // Round ke-i
+        let round_i = newStep("Round " + i);
+        round_i.scrollIntoView();
+
+        let sbytes_text = drawListText("Round" + i.toString(), "Operasi Sub Bytes, Substitusi setiap blok matriks dengan tabel S-Box");
+        sbytes_text.scrollIntoView();
+        let sbytes = await SubBytesWithContext(round_i.getAttribute("id"), rc);
+
+        await timer(delay_time);
+
+        let shift_rows_text = drawListText("Round" + i.toString(), "Operasi Shift Rows, Geser baris pertama matriks sebanyak 0 kali, " +
+                                            "Geser baris kedua matriks sebanyak 1 kali, " +
+                                            "Geser baris ketiga matriks sebanyak 2 kali, " +
+                                            "Geser baris keempat matriks sebanyak 3 kali, ");
+        shift_rows_text.scrollIntoView();
+        let shift_rows_before = drawcenterArray("Round" + i.toString(), sbytes, "Sebelum pergeseran");
+        await timer(delay_time);
+        shift_rows_before.scrollIntoView();
         let shift_rows = ShiftRows(sbytes);
-        let mix_column = MixColumn(shift_rows);
-        rc = AddRoundKey(mix_column, rkey[i]);
+        let shift_rows_after = drawcenterArray("Round" + i.toString(), sbytes, "Hasil Shift Rows");
+        shift_rows_after.scrollIntoView();
+        await timer(delay_time);
+
+        let mix_column_text = drawListText("Round" + i.toString(), "Operasi Mix Column, Lakukan perkalian matriks dengan matriks rijndael dengan bantuan tabel pre-calculated multiply 2 dan 3");
+        mix_column_text.scrollIntoView();
+        await timer(delay_time);
+        let rijndael = [
+            [2, 3, 1, 1],
+            [1, 2, 3, 1],
+            [1, 1, 2, 3],
+            [3, 1, 1, 2]
+        ];
+        arrayWithTwoColumns("Round" + i.toString(), "Hasil Shift Rows", "Matriks Rijndael", shift_rows, rijndael);
+        let mix_column = await MixColumnWithContext("Round" + i.toString(), shift_rows);
+
+        let round_i_addroundkey_text = drawListText("Round" + i.toString(), "Operasi AddRoundKey, lakukan XOR terhadap setiap blok matriks hasil mix column dengan key schedule round " + i.toString());
+        round_i_addroundkey_text.scrollIntoView();
+        
+        arrayWithTwoColumnsXOR("Round" + i.toString(), "Hasil Mix Column", "Key Schedule Round " + i.toString(), mix_column, rkey[i]);
+
+        let rc_result = drawcenterArray("Round" + i.toString(), generateNullMatrix(), "Hasil Operasi AddRoundKey");
+        rc_result.scrollIntoView();
+        let rc_context = drawCenterText("Round" + i.toString(), "");
+        rc_context.scrollIntoView();
+        rc = await AddRoundKeyWithContext(rc_result, rc_context, mix_column, rkey[i]);
     }
 
     // Round 10
-    let sbytes = SubBytes(rc);
+    let round10 = newStep("Round 10");
+    round10.scrollIntoView();
+
+    let sbytes_text = drawListText("Round10", "Operasi Sub Bytes, Substitusi setiap blok matriks dengan tabel S-Box");
+    sbytes_text.scrollIntoView();
+    let sbytes = await SubBytesWithContext("Round10", rc);
+
+    await timer(delay_time);
+
+    let shift_rows_text = drawListText("Round10", "Operasi Shift Rows, Geser baris pertama matriks sebanyak 0 kali, " +
+                                            "Geser baris kedua matriks sebanyak 1 kali, " +
+                                            "Geser baris ketiga matriks sebanyak 2 kali, " +
+                                            "Geser baris keempat matriks sebanyak 3 kali, ");
+    shift_rows_text.scrollIntoView();
+    let shift_rows_before = drawcenterArray("Round10", sbytes, "Sebelum pergeseran");
+    await timer(delay_time);
+    shift_rows_before.scrollIntoView();
     let shift_rows = ShiftRows(sbytes);
-    rc = AddRoundKey(shift_rows, rkey[10]);
+    let shift_rows_after = drawcenterArray("Round10", sbytes, "Hasil Shift Rows");
+    shift_rows_after.scrollIntoView();
+    await timer(delay_time);
+
+    let round10_addroundkey_text = drawListText("Round10", "Operasi AddRoundKey, lakukan XOR terhadap setiap blok matriks hasil shift row dengan key schedule round 10");
+    round10_addroundkey_text.scrollIntoView();
+    
+    arrayWithTwoColumnsXOR("Round10", "Hasil Shift Row", "Key Schedule Round 10", shift_rows, rkey[10]);
+
+    rc_result = drawcenterArray("Round10", generateNullMatrix(), "Hasil Operasi AddRoundKey");
+    rc_result.scrollIntoView();
+    rc_context = drawCenterText("Round10", "");
+    rc_context.scrollIntoView();
+    rc = await AddRoundKeyWithContext(rc_result, rc_context, shift_rows, rkey[10]);
 
     let output = "";
     for (let i = 0; i < 4; i++) {
