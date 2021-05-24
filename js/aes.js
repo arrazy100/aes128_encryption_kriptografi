@@ -745,16 +745,20 @@ async function AESEncryption(plaintext_id, key_id, error_id) {
     let round_0 = newStep("Round 0");
     round_0.scrollIntoView();
 
-    textWithTwoColumns("Round0", "Plain Text", plaintext);
-    textWithTwoColumns("Round0", "Key", key);
+    drawText("Round0", "Plain Text");
+    drawText("Round0", plaintext);
+    drawText("Round0", "Key");
+    drawText("Round0", key);
 
     await timer(delay_time);
 
     let konversihex_text = drawListText("Round0", "Lakukan konversi plain text dan key menjadi hexadecimal");
     konversihex_text.scrollIntoView();
 
-    textWithTwoColumns("Round0", "Plain Text Hex", plaintext_hex);
-    textWithTwoColumns("Round0", "Key Hex", key_hex);
+    drawText("Round0", "Plain Text Hex");
+    drawText("Round0", formatHexToString(plaintext_hex));
+    drawText("Round0", "Key Hex");
+    drawText("Round0", formatHexToString(key_hex));
 
     await timer(delay_time);
 
@@ -865,6 +869,22 @@ async function AESEncryption(plaintext_id, key_id, error_id) {
         }
     }
 
+    let final_result = drawListText("Round10", "Hasil akhir");
+    final_result.scrollIntoView();
+    drawcenterArray("Round10", hex_to_array(output), "Hasil Akhir");
+
+    await timer(delay_time);
+
+    let final_hex = drawText("Round10", "Hasil Akhir Hexadecimal :");
+    final_hex.scrollIntoView();
+    drawText("Round10", formatHexToString(output));
+
+    await timer(delay_time);
+
+    let encoding_final = drawText("Round10", "Hasil Encoding: ");
+    encoding_final.scrollIntoView();
+    drawText("Round10", encode_hex(output));
+
     document.getElementById("aes_encryption").value = encode_hex(output);
 }
 
@@ -905,16 +925,20 @@ async function AESDecryption(encrypted_id, key_id, error_id) {
     let round10 = newStep("Round 10");
     round10.scrollIntoView();
 
-    textWithTwoColumns("Round10", "Encrypted Text", plaintext);
-    textWithTwoColumns("Round10", "Key", key);
+    drawText("Round10", "Encrypted Text");
+    drawText("Round10", plaintext);
+    drawText("Round10", "Key");
+    drawText("Round10", key);
 
     await timer(delay_time);
 
     let konversihex_text = drawListText("Round10", "Lakukan decoding encrypted text, kemudian konversi hasil decoding encrypted text dan key menjadi hexadecimal");
     konversihex_text.scrollIntoView();
 
-    textWithTwoColumns("Round10", "Encrypted Text Hex", plaintext_hex);
-    textWithTwoColumns("Round10", "Key Hex", key_hex);
+    drawText("Round10", "Encrypted Text Hex (Hasil Decoding)");
+    drawText("Round10", formatHexToString(plaintext_hex));
+    drawText("Round10", "Key Hex");
+    drawText("Round10", formatHexToString(key_hex));
 
     await timer(delay_time);
 
@@ -1021,6 +1045,22 @@ async function AESDecryption(encrypted_id, key_id, error_id) {
             output += rc[j][i];
         }
     }
+
+    let final_result = drawListText("Round0", "Hasil akhir");
+    final_result.scrollIntoView();
+    drawcenterArray("Round0", hex_to_array(output), "Hasil Akhir");
+
+    await timer(delay_time);
+
+    let final_hex = drawText("Round0", "Hasil Akhir Hexadecimal :");
+    final_hex.scrollIntoView();
+    drawText("Round0", formatHexToString(output));
+
+    await timer(delay_time);
+
+    let encoding_final = drawText("Round0", "Hasil Dekripsi: ");
+    encoding_final.scrollIntoView();
+    drawText("Round0", hex_to_string(output));
 
     document.getElementById("aes_decryption").value = hex_to_string(output);
 }

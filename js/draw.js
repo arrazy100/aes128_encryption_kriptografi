@@ -264,3 +264,13 @@ function drawImage(parent, img_file) {
 function clearError(error_id) {
     document.getElementById("" + error_id).innerHTML = "";
 }
+
+function formatHexToString(hex) {
+    let str = "";
+
+    for (let i = 0; i < hex.length; i += 2) {
+        str += hex[i] + hex[i + 1] + " ";
+    }
+
+    return str;
+}
