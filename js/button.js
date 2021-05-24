@@ -95,6 +95,13 @@ function validateForm(plain_id, key_id) {
     else return false;
 }
 
+function validateDecryptionForm(key_id) {
+    let key_length = document.getElementById("" + key_id).value.length;
+
+    if (key_length === 16) return true;
+    else return false;
+}
+
 let el = document.getElementById("plaintext_length");
 let m_length = document.getElementById("plaintext").value.length;
 el.innerHTML = m_length + " characters";

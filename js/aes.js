@@ -866,8 +866,8 @@ async function AESEncryption(plaintext_id, key_id) {
 }
 
 async function AESDecryption(encrypted_id, key_id) {
-    if (!validateForm(encrypted_id, key_id)) {
-        alert("encrypted text atau key kurang dari 16 karakter");
+    if (!validateDecryptionForm(key_id)) {
+        alert("decryption key kurang dari 16 karakter");
         return;
     }
 
