@@ -72,11 +72,6 @@ document.getElementById("encrypted_text").addEventListener("input", function() {
     var el = document.getElementById("encrypted_length");
     var m_length = document.getElementById("encrypted_text").value.length;
 
-    if (m_length > this.maxLength) {
-        this.value = this.value.slice(0, this.maxLength);
-        m_length = document.getElementById("encrypted_text").value.length;
-    }
-
     el.innerHTML = m_length + " characters";
 });
 
