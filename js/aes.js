@@ -708,9 +708,12 @@ function allTables() {
     
 }
 
-async function AESEncryption(plaintext_id, key_id) {
+async function AESEncryption(plaintext_id, key_id, error_id) {
     if (!validateForm(plaintext_id, key_id)) {
-        alert("plain text atau key kurang dari 16 karakter");
+        document.getElementById("" + error_id).innerHTML = "Plain text atau key kurang dari 16 karakter";
+        setTimeout(function() {
+            clearError(error_id);
+        }, 2000);
         return;
     }
 
@@ -865,9 +868,12 @@ async function AESEncryption(plaintext_id, key_id) {
     document.getElementById("aes_encryption").value = encode_hex(output);
 }
 
-async function AESDecryption(encrypted_id, key_id) {
+async function AESDecryption(encrypted_id, key_id, error_id) {
     if (!validateDecryptionForm(key_id)) {
-        alert("decryption key kurang dari 16 karakter");
+        document.getElementById("" + error_id).innerHTML = "Decryption key kurang dari 16 karakter";
+        setTimeout(function() {
+            clearError(error_id);
+        }, 2000);
         return;
     }
 

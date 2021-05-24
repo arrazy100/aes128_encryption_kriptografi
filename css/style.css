@@ -55,6 +55,13 @@ html {
     text-align: center;
 }
 
+.form-error {
+    text-align: center;
+    font-size: 0.8em;
+    margin: 10px 0;
+    color: red;
+}
+
 .form-input {
     margin-bottom: 20px;
 }

@@ -260,3 +260,7 @@ function drawImage(parent, img_file) {
     el.style.width = "100%";
     document.getElementById("" + parent).appendChild(el);
 }
+
+function clearError(error_id) {
+    document.getElementById("" + error_id).innerHTML = "";
+}

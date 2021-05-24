@@ -24,6 +24,7 @@
                 <div class="form-title">
                     AES Encryption
                 </div>
+                <div class="form-error" id="encryption_error"></div>
                 <div class="form-input">
                     <input type="text" name="plaintext" id="plaintext" maxlength="16" placeholder="Plain text">
                     <div id="plaintext_length" class="length-text">0 characters</div>
@@ -33,7 +34,7 @@
                     <div id="key_length" class="length-text">0 characters</div>
                 </div>
                 
-                <input type="button" class="form-button" value="AES Encryption" onclick="AESEncryption('plaintext', 'key');">
+                <input type="button" class="form-button" value="AES Encryption" onclick="AESEncryption('plaintext', 'key', 'encryption_error');">
 
                 <div class="result-text">
                     <input type="text" id="aes_encryption" placeholder="Encrypted Text">
@@ -45,6 +46,7 @@
                 <div class="form-title">
                     AES Decryption
                 </div>
+                <div class="form-error" id="decryption_error"></div>
                 <div class="form-input">
                     <input type="text" name="encrypted_text" id="encrypted_text" placeholder="Encrypted Text">
                     <div id="encrypted_length" class="length-text">0 characters</div>
@@ -54,7 +56,7 @@
                     <div id="decryption_key_length" class="length-text">0 characters</div>
                 </div>
                 
-                <input type="button" class="form-button" value="AES Decryption" onclick="AESDecryption('encrypted_text', 'decryption_key');">
+                <input type="button" class="form-button" value="AES Decryption" onclick="AESDecryption('encrypted_text', 'decryption_key', 'decryption_error');">
 
                 <div class="result-text">
                     <input type="text" id="aes_decryption" placeholder="Decrypted Text">
