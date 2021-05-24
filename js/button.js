@@ -43,3 +43,73 @@ document.getElementById("skip_btn").addEventListener("click", function() {
 document.getElementById("top_btn").addEventListener("click", function() {
     document.getElementById("top").scrollIntoView();
 });
+
+document.getElementById("plaintext").addEventListener("input", function() {
+    let el = document.getElementById("plaintext_length");
+    let m_length = document.getElementById("plaintext").value.length;
+
+    if (m_length > this.maxLength) {
+        this.value = this.value.slice(0, this.maxLength);
+        m_length = document.getElementById("plaintext").value.length;
+    }
+
+    el.innerHTML = m_length + " characters";
+});
+
+document.getElementById("key").addEventListener("input", function() {
+    var el = document.getElementById("key_length");
+    var m_length = document.getElementById("key").value.length;
+
+    if (m_length > this.maxLength) {
+        this.value = this.value.slice(0, this.maxLength);
+        m_length = document.getElementById("key").value.length;
+    }
+
+    el.innerHTML = m_length + " characters";
+});
+
+document.getElementById("encrypted_text").addEventListener("input", function() {
+    var el = document.getElementById("encrypted_length");
+    var m_length = document.getElementById("encrypted_text").value.length;
+
+    if (m_length > this.maxLength) {
+        this.value = this.value.slice(0, this.maxLength);
+        m_length = document.getElementById("encrypted_text").value.length;
+    }
+
+    el.innerHTML = m_length + " characters";
+});
+
+document.getElementById("decryption_key").addEventListener("input", function() {
+    var el = document.getElementById("decryption_key_length");
+    var m_length = document.getElementById("decryption_key").value.length;
+
+    if (m_length > this.maxLength) {
+        this.value = this.value.slice(0, this.maxLength);
+        m_length = document.getElementById("decryption_key").value.length;
+    }
+
+    el.innerHTML = m_length + " characters";
+});
+
+function validateForm(plain_id, key_id) {
+    let plain_length = document.getElementById("" + plain_id).value.length;
+    let key_length = document.getElementById("" + key_id).value.length;
+
+    if (plain_length === 16 && key_length === 16) return true;
+    else return false;
+}
+
+let el = document.getElementById("plaintext_length");
+let m_length = document.getElementById("plaintext").value.length;
+el.innerHTML = m_length + " characters";
+el = document.getElementById("key_length");
+m_length = document.getElementById("key").value.length;
+el.innerHTML = m_length + " characters";
+
+el = document.getElementById("encrypted_length");
+m_length = document.getElementById("encrypted_text").value.length;
+el.innerHTML = m_length + " characters";
+el = document.getElementById("decryption_key_length");
+m_length = document.getElementById("decryption_key").value.length;
+el.innerHTML = m_length + " characters";

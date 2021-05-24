@@ -253,57 +253,6 @@ const multiply_14 = [
     0xd7,0xd9,0xcb,0xc5,0xef,0xe1,0xf3,0xfd,0xa7,0xa9,0xbb,0xb5,0x9f,0x91,0x83,0x8d
 ];
 
-function KeySchedule(key_hex) {
-    let rkey = new Array(11);
-    rkey[0] = key_hex;
-
-    for (let round = 1; round <= 10; round++) {
-        let rkey_before = rkey[round - 1];
-
-        let first_col = rkey_before.substring(0, 8);
-
-        let last_col = rkey_before.substring(26, 32) + rkey_before.substring(24, 26);
-
-        let current_rcon = rcon[round - 1];
-        
-        let s_bytes = "";
-        for (let i = 0; i < last_col.length; i += 2) {
-            let row = hex_to_decimal(last_col[i]);
-            let col = hex_to_decimal(last_col[i + 1]);
-            s_bytes += s_box[row][col];
-        }
-
-        let first_col_newround = "";
-        for (let i = 0; i < 8; i += 2) {
-            let xor_result = XOR(first_col[i] + first_col[i + 1], s_bytes[i] + s_bytes[i + 1]);
-            xor_result = XOR(xor_result, current_rcon[i] + current_rcon[i + 1]);
-
-            first_col_newround += xor_result;
-        }
-
-        let second_col = rkey_before.substring(8, 16);
-        let third_col = rkey_before.substring(16, 24);
-        let fourth_col = rkey_before.substring(24, 32);
-        let second_col_newround = "";
-        let third_col_newround = "";
-        let fourth_col_newround = "";
-
-        for (let i = 0; i < 8; i += 2) {
-            second_col_newround += XOR(first_col_newround[i] + first_col_newround[i + 1], second_col[i] + second_col[i + 1]);
-            third_col_newround += XOR(second_col_newround[i] + second_col_newround[i + 1], third_col[i] + third_col[i + 1]);
-            fourth_col_newround += XOR(third_col_newround[i] + third_col_newround[i + 1], fourth_col[i] + fourth_col[i + 1]);
-        }
-
-        rkey[round] = first_col_newround + second_col_newround + third_col_newround + fourth_col_newround;
-    }
-
-    for (let i = 0; i <= 10; i++) {
-        rkey[i] = hex_to_array(rkey[i]);
-    }
-
-    return rkey;
-}
-
 async function KeyScheduleToElement(parent, key_hex) {
     let rkey = new Array(11);
     rkey[0] = key_hex;
@@ -374,7 +323,7 @@ async function KeyScheduleToElement(parent, key_hex) {
             hex_to_array(current_rcon)
         );
 
-        let xor_rkey = drawCenterText(parent, "XOR hasil Sub Bytes dengan kolom pertama dan matriks rcon");
+        drawCenterText(parent, "XOR hasil Sub Bytes dengan kolom pertama dan matriks rcon");
 
         await timer(delay_time);
 
@@ -405,9 +354,11 @@ async function KeyScheduleToElement(parent, key_hex) {
             await timer(loop_delay);
         }
 
-        let xor_three_result = drawCenterText(parent, "Hasil XOR digunakan sebagai kolom pertama Key Schedule baru");
+        drawCenterText(parent, "Hasil XOR digunakan sebagai kolom pertama Key Schedule baru");
 
         await timer(delay_time);
+
+        drawcenterArray(parent, hex_to_array(rkey[round - 1]), "Key Schedule Round " + (round - 1).toString());
 
         let new_keyschedule = drawcenterArray(parent, generateNullMatrix(), "Key Schedule Baru");
         new_keyschedule.scrollIntoView();
@@ -425,15 +376,15 @@ async function KeyScheduleToElement(parent, key_hex) {
         let fourth_col_newround = "";
 
         let second_col_text = drawCenterText(parent, "");
-        second_col_text.innerHTML = "Kolom kedua Key Schedule baru = XOR kolom pertama Key Schedule baru dengan kolom kedua Round " + (round - 1).toString();
+        second_col_text.innerHTML = "XOR Col-1 Key Schedule dengan Col-2 Round " + (round - 1).toString() + " = Col-2 Key Schedule";
         let second_col_result = drawCenterText(parent, "");
 
         let third_col_text = drawCenterText(parent, "");
-        third_col_text.innerHTML = "Kolom ketiga Key Schedule baru = XOR kolom kedua Key Schedule baru dengan kolom ketiga Round " + (round - 1).toString();
+        third_col_text.innerHTML = "XOR Col-2 Key Schedule dengan Col-3 Round " + (round - 1).toString()  + " = Col-3 Key Schedule";
         let third_col_result = drawCenterText(parent, "");
 
         let fourth_col_text = drawCenterText(parent, "");
-        fourth_col_text.innerHTML = "Kolom keempat Key Schedule baru = XOR kolom ketiga Key Schedule baru dengan kolom keempat Round " + (round - 1).toString();
+        fourth_col_text.innerHTML = "XOR Col-3 Key Schedule dengan Col-4 Round " + (round - 1).toString() + " = Col-4 Key Schedule";
         let fourth_col_result = drawCenterText(parent, "");
 
         for (let i = 0; i < 8; i += 2) {
@@ -445,6 +396,8 @@ async function KeyScheduleToElement(parent, key_hex) {
                                             " XOR " + second_col[i] + second_col[i + 1] +
                                             " = " + col_matrix[1].innerHTML;
 
+            await timer(loop_delay);
+
             third_col_newround += XOR(second_col_newround[i] + second_col_newround[i + 1], third_col[i] + third_col[i + 1]);
 
             col_matrix = new_keyschedule.rows[Math.floor((i + 1 )/ 2)].cells;
@@ -452,6 +405,8 @@ async function KeyScheduleToElement(parent, key_hex) {
             third_col_result.innerHTML = second_col_newround[i] + second_col_newround[i + 1] +
                                             " XOR " + third_col[i] + third_col[i + 1] +
                                             " = " + col_matrix[2].innerHTML;
+
+            await timer(loop_delay);
 
             fourth_col_newround += XOR(third_col_newround[i] + third_col_newround[i + 1], fourth_col[i] + fourth_col[i + 1]);
 
@@ -580,7 +535,7 @@ async function MixColumnWithContext(parent, arr) {
         let col_matrix = mix_column.rows[0].cells;
         col_matrix[i].innerHTML = decimal_to_hex(mc[0][i]);
         d0_result.innerHTML = "2 * " + decimal_to_hex(arr[0][i]) + " + 3 * " + decimal_to_hex(arr[1][i]) +
-                                " + 1 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i]))  + " = " + col_matrix[i].innerHTML;
+                                " + 1 * " + decimal_to_hex(arr[2][i]) + " + 1 * " + decimal_to_hex(arr[3][i])  + " = " + col_matrix[i].innerHTML;
         
         await timer(loop_delay);
 
@@ -589,7 +544,7 @@ async function MixColumnWithContext(parent, arr) {
         col_matrix = mix_column.rows[1].cells;
         col_matrix[i].innerHTML = decimal_to_hex(mc[1][i]);
         d1_result.innerHTML = "1 * " + decimal_to_hex(arr[0][i]) + " + 2 * " + decimal_to_hex(arr[1][i]) +
-                                " + 3 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i]))  + " = " + col_matrix[i].innerHTML;
+                                " + 3 * " + decimal_to_hex(arr[2][i]) + " + 1 * " + decimal_to_hex(arr[3][i])  + " = " + col_matrix[i].innerHTML;
 
         await timer(loop_delay);
 
@@ -597,8 +552,8 @@ async function MixColumnWithContext(parent, arr) {
 
         col_matrix = mix_column.rows[2].cells;
         col_matrix[i].innerHTML = decimal_to_hex(mc[2][i]);
-        d2_result.innerHTML = "1 * " + decimal_to_hex(arr[0][i]) + " + 2 * " + decimal_to_hex(arr[1][i]) +
-                                " + 3 * " + decimal_to_hex(arr[2][i] + " + 1 * " + decimal_to_hex(arr[3][i])) + " = " + col_matrix[i].innerHTML;
+        d2_result.innerHTML = "1 * " + decimal_to_hex(arr[0][i]) + " + 1 * " + decimal_to_hex(arr[1][i]) +
+                                " + 2 * " + decimal_to_hex(arr[2][i]) + " + 3 * " + decimal_to_hex(arr[3][i]) + " = " + col_matrix[i].innerHTML;
 
         await timer(loop_delay);
 
@@ -754,6 +709,11 @@ function allTables() {
 }
 
 async function AESEncryption(plaintext_id, key_id) {
+    if (!validateForm(plaintext_id, key_id)) {
+        alert("plain text atau key kurang dari 16 karakter");
+        return;
+    }
+
     removeAllStep();
 
     allTables();
@@ -906,6 +866,11 @@ async function AESEncryption(plaintext_id, key_id) {
 }
 
 async function AESDecryption(encrypted_id, key_id) {
+    if (!validateForm(encrypted_id, key_id)) {
+        alert("encrypted text atau key kurang dari 16 karakter");
+        return;
+    }
+
     removeAllStep();
 
     allTables();

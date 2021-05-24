@@ -52,10 +52,16 @@ html {
 .form-title {
     font-size: 32px;
     margin-bottom: 30px;
+    text-align: center;
 }
 
 .form-input {
     margin-bottom: 20px;
+}
+
+.form-input > input[type=text] {
+    display: block;
+    width: 100%;
 }
 
 .form-button {
@@ -180,10 +186,21 @@ input[type=button]:hover {
     text-align: center;
 }
 
+.result-text > input[type=text] {
+    display: block;
+    width: 100%;
+}
+
 .skip-btn {
     position: fixed;
     bottom: 0;
     right: 0;
     color: white;
     text-align: center;
+}
+
+.length-text {
+    font-size: 0.8em;
+    padding: 1em;
+    float: right;
 }
